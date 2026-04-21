@@ -1,78 +1,78 @@
-# Nike Brand Reputation Monitor - Setup Instructions
+# Nike Brand Reputation Monitor - Full Stack Implementation
+
+## 🚀 Live Demo
+**[https://nike-reputation-dashboard.onrender.com](https://nike-reputation-dashboard.onrender.com)**
 
 ## What's Included
-✅ All your changes are saved:
-- Pure white background (light mode default)
-- Nike logo in header
-- AI Chat Assistant (bottom right)
-- Sentiment Pulse (heartbeat on right side)
-- Social Media Feed with instructions
-- AI Insights Panel with instructions
-- All 35+ components
+This project is a full-stack real-time analytics dashboard built with React, Vite, Express, and Socket.io.
 
-## Setup on Windows
+### ✨ Key Features:
+- **Scroll-Driven Theme Engine:** The site starts bright and organically transitions to a cinematic dark mode as you scroll down. No hardware buttons or toggle switches used—just pure scroll metrics driving CSS custom properties.
+- **Real-Time Data (Socket.io):** A live connection streams continuous reputation score updates across 100 generated Nike products spanning 6 categories (Lifestyle, Running, Basketball, Training, Skate, Soccer).
+- **Simulated Reddit Feed:** A live social media ticker simulating incoming product reviews and modifying the reputation scores in real-time. (Includes a graceful fallback for CORS restrictions).
+- **Chromatic Ring Hero:** A canvas-based interactive hero section that animates vibrant concentric rings.
+- **Premium Apple-Inspired UI:** Glassmorphism, smooth animations (Framer Motion + GSAP), hover effects, and strict adherence to modern typography and spacing.
+- **Data Visualization:** Interactive charts including Spider/Radar charts, Bar charts, and Trend Line graphs for comprehensive reputation insights.
+- **AI Integration UI:** Live AI Insight panels and a functional Chat Assistant UI for querying product metrics.
 
-### 1. Install Prerequisites
-- Node.js (v16 or higher): https://nodejs.org/
-- Git (optional): https://git-scm.com/
+## Setup Instructions for Local Development
 
-### 2. Extract the Project
-- Extract `brand-reputation-monitor-final.tar.gz` or copy the `brand-reputation-monitor-final` folder
+### 1. Prerequisites
+- Node.js (v18 or higher)
+- NPM or regular Git
 
-### 3. Install Dependencies
+### 2. Install Dependencies
 
-Open Command Prompt or PowerShell in the project folder:
+Open Command Prompt or Terminal in the project root:
 
 ```bash
-# Install server dependencies
-cd server
-npm install
-
-# Install client dependencies
-cd ../client
-npm install
+# Install all dependencies (Client + Server)
+npm run install:all
 ```
 
-### 4. Start the Application
+*(Alternatively, you can manually `cd server && npm install` and then `cd ../client && npm install`)*
 
-**Terminal 1 - Start Backend Server:**
+### 3. Start the Application
+
+**Run Backend Server:**
 ```bash
-cd server
 npm start
+# or cd server && node server.js
 ```
-You should see: "🚀 Server on http://localhost:3001"
+*The server runs on port 3001 and emits WebSockets.*
 
-**Terminal 2 - Start Frontend:**
+**Run Frontend Development Server (Optional):**
+If you want to edit React code with Hot-Module-Replacement:
 ```bash
 cd client
 npm run dev
 ```
-You should see: "Local: http://localhost:5173"
 
-### 5. Open in Browser
-Navigate to: http://localhost:5173
+### 4. Production Build & Deployment (Render.com)
 
-## Features
-- **Header**: Nike logo, theme toggle (🌙/☀️), Overview/Database tabs
-- **Hero**: Chromatic ring animation with live stats
-- **Sentiment Pulse**: Heartbeat indicator on right side
-- **AI Chat**: Click chat bubble in bottom right corner
-- **Database View**: Scroll down to see Social Media Feed and AI Insights
-- **Theme Toggle**: Click 🌙/☀️ to switch between light/dark mode
+This project includes a `render.yaml` configuration to auto-deploy to Render via GitHub:
 
-## Troubleshooting
-- If port 3001 is in use: Change PORT in server/server.js
-- If port 5173 is in use: Vite will automatically use next available port
-- Clear cache: Delete client/.vite and client/dist folders
+1. Push your repository to GitHub.
+2. Sign in to [Render](https://dashboard.render.com).
+3. Connect your repository.
+4. Render will automatically install dependencies, build the Vite app, and serve it via Express using the configuration provided.
 
-## All Changes Applied
-1. ✅ Default theme: light (white background)
-2. ✅ AnimatedBackground removed (pure white/black)
-3. ✅ Header at top with Nike logo
-4. ✅ SentimentPulse heartbeat animation
-5. ✅ AIChatAssistant chat bubble
-6. ✅ Social Media Feed with instructions
-7. ✅ AI Insights Panel with instructions
-8. ✅ All 35+ components included
 
-Enjoy your Nike Brand Reputation Monitor! 🚀
+## Database Schema & Products
+
+The application simulates a continuous data stream. Upon startup, `server/utils/generateProducts.js` automatically generates a database of 100 realistic Nike products across various categories with randomized base scores and prices. 
+
+**Structure:**
+- `ProdID`: Integer (Primary Key)
+- `Name`: String (e.g. "Air Force 1 Low", "Vaporfly 3")
+- `Category`: String ("Lifestyle", "Running", etc.)
+- `Score`: Integer (0-100)
+- `Price`: Float
+
+See `schema.sql` for the SQL-representation of the 100 seeded products.
+
+## Architecture & Tech Stack
+
+- **Frontend:** React 18, Vite, TailwindCSS (for layout utilities), Vanilla CSS (for theme engine), Framer Motion, GSAP, Chart.js, Recharts.
+- **Backend:** Node.js, Express (REST API + static serving), Socket.io (real-time events).
+- **Deployment:** Render.com (Web Service).
