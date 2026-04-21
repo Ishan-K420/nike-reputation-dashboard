@@ -1,18 +1,9 @@
 import { useEffect, useRef } from 'react';
 
 /* ─────────────────────────────────────────────────────
-   CHROMATIC RING PULSE  — Apple AirPods style
-   Extracted from nike-chromatic-ring.html
-   Technique:
-   - Multiple concentric arcs drawn as polylines
-   - Each arc has 3 colour channels (R, G, B) spatially
-     offset from each other — chromatic aberration
-   - Arcs "breathe" (radius pulses), rotate slowly,
-     and have a wave-warp along their circumference
-   - On dark:  vivid saturated colours, mid opacity
-   - On light: same hues but rendered via
-               globalCompositeOperation 'multiply'
-               so they darken the white bg instead
+   CHROMATIC RING HERO — Restored with new branding
+   "REAL-TIME BRAND INTELLIGENCE" headline
+   Chromatic ring canvas animation behind text
 ───────────────────────────────────────────────────── */
 
 const RINGS = [
@@ -27,13 +18,9 @@ const SEGMENTS = 120;
 const CHROMA   = 3.5;
 const LINE_W   = 3.5;
 
-export default function ChromaticRingHero({ isDark = true, products = [] }) {
+export default function ChromaticRingHero({ products = [] }) {
   const canvasRef = useRef(null);
-  const isDarkRef = useRef(isDark);
   const rafRef    = useRef(null);
-
-  // Keep ref in sync so the render loop always sees the latest theme
-  useEffect(() => { isDarkRef.current = isDark; }, [isDark]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -77,28 +64,23 @@ export default function ChromaticRingHero({ isDark = true, products = [] }) {
       ctx.stroke();
     }
 
-    function drawVignette() {
-      // Vignette removed
-    }
-
     function render(t) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      ctx.globalCompositeOperation = isDarkRef.current ? 'screen' : 'multiply';
+      // Always use 'multiply' for light hero start
+      ctx.globalCompositeOperation = 'multiply';
 
       RINGS.forEach((ring) => {
         [0, 1, 2].forEach((ch) => {
           const hue   = ring.hue[ch];
-          const sat   = isDarkRef.current ? '90%' : '80%';
-          const lgt   = isDarkRef.current ? '60%' : '40%';
-          const alpha = isDarkRef.current ? 0.55  : 0.45;
+          const sat   = '80%';
+          const lgt   = '40%';
+          const alpha = 0.45;
           const color = `hsl(${hue},${sat},${lgt})`;
           const pts   = buildArcPoints(ring, t, ch);
           drawArc(pts, color, alpha);
         });
       });
 
-      drawVignette();
       rafRef.current = requestAnimationFrame(render);
     }
 
@@ -110,17 +92,11 @@ export default function ChromaticRingHero({ isDark = true, products = [] }) {
     };
   }, []);
 
-  /* derive stats from live products */
-  const avgScore  = products.length
-    ? (products.reduce((s, p) => s + p.Score, 0) / products.length).toFixed(1)
-    : '—';
-  const atRisk    = products.filter(p => p.Score < 80).length;
   const totalProd = products.length || 100;
-
-  const dark = isDark;
 
   return (
     <section
+      className="hero-section"
       style={{
         position: 'relative',
         width: '100%',
@@ -130,8 +106,7 @@ export default function ChromaticRingHero({ isDark = true, products = [] }) {
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
-        background: isDark ? '#000' : '#fff',
-        transition: 'background 0.5s',
+        background: '#fff',
       }}
     >
       {/* ── Canvas ring ── */}
@@ -154,106 +129,76 @@ export default function ChromaticRingHero({ isDark = true, products = [] }) {
           zIndex: 10,
           textAlign: 'center',
           padding: '0 2rem',
-          fontFamily: "-apple-system, 'Helvetica Neue', Arial, sans-serif",
         }}
       >
         <p
           style={{
+            fontFamily: "'Archivo Narrow', 'Inter', sans-serif",
             fontSize: 11,
-            letterSpacing: '0.2em',
+            fontWeight: 600,
+            letterSpacing: '0.35em',
             textTransform: 'uppercase',
             marginBottom: '1.5rem',
-            color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
-            transition: 'color 0.5s',
+            color: 'var(--text-muted)',
+            transition: 'color 0.4s',
           }}
         >
-          Real-Time Sentiment Analysis
+          Nike Brand Monitor · {totalProd} Products
         </p>
 
         <h1
           style={{
-            fontSize: 'clamp(58px, 8.5vw, 112px)',
-            fontWeight: 800,
-            lineHeight: 0.95,
-            letterSpacing: '-0.03em',
-            color: isDark ? '#fff' : '#0a0a0a',
-            transition: 'color 0.5s',
+            fontFamily: "'Antonio', sans-serif",
+            fontWeight: 700,
+            lineHeight: 0.85,
+            letterSpacing: '-0.04em',
+            fontSize: 'clamp(44px, 8.5vw, 120px)',
+            textTransform: 'uppercase',
           }}
         >
-          Nike Brand<br />Reputation
+          <span
+            style={{
+              display: 'block',
+              color: 'var(--text-primary)',
+              transition: 'color 0.4s',
+            }}
+          >
+            Real-Time
+          </span>
+          <span
+            style={{
+              display: 'block',
+              color: '#ff2d00',
+              textShadow: '0 0 60px rgba(255,45,0,0.15)',
+            }}
+          >
+            Brand
+          </span>
+          <span
+            style={{
+              display: 'block',
+              color: 'var(--text-primary)',
+              transition: 'color 0.4s',
+            }}
+          >
+            Intelligence
+          </span>
         </h1>
 
         <p
           style={{
-            marginTop: '1.4rem',
+            fontFamily: "'Archivo Narrow', 'Inter', sans-serif",
             fontSize: 15,
             lineHeight: 1.7,
-            color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
-            transition: 'color 0.5s',
+            color: 'var(--text-muted)',
+            transition: 'color 0.4s',
+            maxWidth: 480,
+            margin: '1.8rem auto 0',
           }}
         >
           Monitoring {totalProd} products across 6 categories.<br />
           Powered by live social media sentiment data.
         </p>
-
-        {/* ── Stats bar ── */}
-        <div
-          style={{
-            display: 'flex',
-            marginTop: '3.5rem',
-            borderRadius: 14,
-            overflow: 'hidden',
-            background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
-            transition: 'background 0.5s, border-color 0.5s',
-          }}
-        >
-          {[
-            { num: avgScore, label: 'Average Score', alert: 'Needs Attention' },
-            { num: totalProd, label: 'Products Monitored', alert: null },
-            { num: atRisk || '—', label: 'At Risk',  alert: 'Score < 80' },
-          ].map((stat, i, arr) => (
-            <div
-              key={i}
-              style={{
-                padding: '1.2rem 2.5rem',
-                textAlign: 'center',
-                borderRight: i < arr.length - 1
-                  ? `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`
-                  : 'none',
-                transition: 'border-color 0.5s',
-              }}
-            >
-              <div
-                style={{
-                  fontSize: '2.2rem',
-                  fontWeight: 700,
-                  color: isDark ? '#fff' : '#0a0a0a',
-                  transition: 'color 0.5s',
-                }}
-              >
-                {stat.num}
-              </div>
-              <div
-                style={{
-                  fontSize: 10,
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase',
-                  marginTop: 3,
-                  color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
-                  transition: 'color 0.5s',
-                }}
-              >
-                {stat.label}
-              </div>
-              {stat.alert && (
-                <div style={{ fontSize: 11, color: '#ef4444', marginTop: 2 }}>
-                  {stat.alert}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* ── Scroll hint ── */}
@@ -264,28 +209,21 @@ export default function ChromaticRingHero({ isDark = true, products = [] }) {
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 10,
-          fontSize: 10,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           gap: 6,
           animation: 'chroBob 2.4s ease-in-out infinite',
-          color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
-          transition: 'color 0.5s',
-          fontFamily: "-apple-system, 'Helvetica Neue', Arial, sans-serif",
+          color: 'var(--text-muted)',
+          fontFamily: "'Archivo Narrow', 'Inter', sans-serif",
+          fontSize: 10,
+          fontWeight: 600,
+          letterSpacing: '0.3em',
+          textTransform: 'uppercase',
         }}
       >
         Scroll
-        <div
-          style={{
-            width: 1,
-            height: 28,
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
+        <div style={{ width: 1, height: 35, position: 'relative', overflow: 'hidden' }}>
           <div
             style={{
               position: 'absolute',
@@ -293,15 +231,13 @@ export default function ChromaticRingHero({ isDark = true, products = [] }) {
               left: 0,
               width: 1,
               height: '100%',
-              background: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+              background: 'var(--text-muted)',
               animation: 'chroDrip 2.4s ease-in-out infinite',
-              transition: 'background 0.5s',
             }}
           />
         </div>
       </div>
 
-      {/* Keyframe styles injected once */}
       <style>{`
         @keyframes chroBob  { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(5px)} }
         @keyframes chroDrip { 0%{top:-100%} 100%{top:200%} }

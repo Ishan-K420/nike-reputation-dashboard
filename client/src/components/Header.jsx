@@ -1,35 +1,57 @@
 import { useState, useEffect } from 'react';
 import NotificationCenter from './NotificationCenter';
 
-function Header({ activeView, onViewChange, connected, theme, onToggleTheme, activityLog = [] }) {
-  const isDark = theme === 'dark';
+/* ─────────────────────────────────────────────
+   Header — No toggle button. Theme is scroll-driven.
+───────────────────────────────────────────── */
+
+function Header({ activeView, onViewChange, connected, activityLog = [] }) {
   return (
     <header
       className="sticky top-0 z-50"
       style={{
         backdropFilter: 'blur(24px) saturate(180%)',
         WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-        background: isDark
-          ? 'rgba(0, 0, 0, 0.55)'
-          : 'rgba(255, 255, 255, 0.65)',
-        borderBottom: isDark
-          ? '1px solid rgba(255,255,255,0.07)'
-          : '1px solid rgba(0,0,0,0.06)',
-        transition: 'background 1.4s cubic-bezier(0.4,0,0.2,1), border-color 1s ease',
+        background: 'var(--header-bg)',
+        borderBottom: '1px solid var(--border-color)',
+        transition: 'background 0.3s, border-color 0.3s',
       }}
     >
       <div className="max-w-6xl mx-auto px-6 py-3.5 flex items-center justify-between">
-        {/* Logo with Nike Swoosh */}
+        {/* Nike Logo + Brand Name */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-black flex items-center justify-center">
-            <svg width="24" height="24" viewBox="0 0 1000 1000" fill="white">
-              <path d="M245.8,631.4c-21.4,0-39.7-2.5-54.8-7.4c-14.9-4.9-25.2-11.4-30.9-19.4c-5.7-8-7.6-16.9-5.7-26.6 c2.8-14.4,11.5-25.1,26.2-32c14.6-6.9,35.6-10.4,62.9-10.4c42.7,0,99.7,11.2,171.1,33.5c0,0,0,0,0,0 c115.4,36.1,244.8,54.2,388.1,54.2c30.5,0,49.4-2.8,56.7-8.3c7.3-5.5,8.5-13.2,3.6-23c-3.6-7.2-11.6-15.4-24-24.6 c-12.4-9.2-29.2-18.9-50.4-29.1c-21.2-10.2-46.7-20.7-76.5-31.5c-29.8-10.8-63.9-21.8-102.3-33c-38.4-11.2-80.9-22.5-127.5-33.9 c-46.6-11.4-97.3-22.8-152.1-34.2c-54.8-11.4-113.6-22.8-176.4-34.2c-62.8-11.4-129.5-22.8-200.1-34.2 c-70.6-11.4-145-22.8-223.2-34.2c-78.2-11.4-160.1-22.8-245.7-34.2L0,245.8l245.8,0c85.6,11.4,167.5,22.8,245.7,34.2 c78.2,11.4,152.6,22.8,223.2,34.2c70.6,11.4,137.3,22.8,200.1,34.2c62.8,11.4,121.6,22.8,176.4,34.2 c54.8,11.4,105.5,22.8,152.1,34.2c46.6,11.4,89.1,22.7,127.5,33.9c38.4,11.2,72.5,22.2,102.3,33c29.8,10.8,55.3,21.3,76.5,31.5 c21.2,10.2,38,19.9,50.4,29.1c12.4,9.2,20.4,17.4,24,24.6c4.9,9.8,3.7,17.5-3.6,23c-7.3,5.5-26.2,8.3-56.7,8.3 c-143.3,0-272.7-18.1-388.1-54.2c0,0,0,0,0,0C345.5,620.2,288.5,609,245.8,609c-27.3,0-48.3,3.5-62.9,10.4 c-14.7,6.9-23.4,17.6-26.2,32c-1.9,9.7,0,18.6,5.7,26.6c5.7,8,16,14.5,30.9,19.4C208.1,701.3,224.4,703.8,245.8,703.8z"/>
-            </svg>
+          <svg
+            width="44"
+            height="18"
+            viewBox="0 0 69 30"
+            style={{ fill: 'var(--text-primary)', transition: 'fill 0.3s' }}
+          >
+            <path d="M68.56 4.05c-.52.2-1.06.37-1.6.52-5.88 1.62-11.78 3.18-17.66 4.81a236.6 236.6 0 0 0-17.47 5.63 47.7 47.7 0 0 0-8.56 4.07c-1.85 1.18-3.4 2.58-4.1 4.7-.43 1.32-.34 2.62.27 3.85.72 1.44 1.92 2.37 3.36 3.02 1.63.74 3.37 1.07 5.15 1.2 2.38.17 4.75.02 7.12-.25 3.34-.38 6.62-1.08 9.87-1.93.67-.18 1.34-.37 2.01-.55l.08-.02c-.03.05-.05.08-.07.12-1.53 2.42-3.57 4.34-6.03 5.78-2.02 1.18-4.2 1.97-6.5 2.37-2.38.41-4.77.46-7.16.15a19.64 19.64 0 0 1-7.47-2.54c-2.14-1.28-3.8-3.02-4.75-5.35-.7-1.72-.9-3.52-.6-5.36.38-2.32 1.4-4.33 2.9-6.1 1.85-2.2 4.12-3.84 6.63-5.17A65.6 65.6 0 0 1 34.5 7.8c5.1-1.8 10.3-3.28 15.54-4.6 4.3-1.08 8.64-2 13.02-2.7 1.5-.24 3-.43 4.52-.5.5-.03 1 .02 1.5.07.15.01.22.08.2.23-.04.25-.1.5-.18.74l-.55.01z"/>
+          </svg>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3rem' }}>
+            <span style={{
+              fontFamily: "'Antonio', sans-serif",
+              fontSize: '1rem',
+              fontWeight: 700,
+              letterSpacing: '-0.5px',
+              textTransform: 'uppercase',
+              color: 'var(--text-primary)',
+              transition: 'color 0.3s',
+            }}>
+              Brand
+            </span>
+            <span style={{
+              fontFamily: "'Archivo Narrow', 'Inter', sans-serif",
+              fontSize: '0.65rem',
+              fontWeight: 600,
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              color: 'var(--text-muted)',
+              transition: 'color 0.3s',
+            }}>
+              Intelligence
+            </span>
           </div>
-          <span className="text-sm font-medium text-gray-500 hidden sm:block"
-                style={{ transition: 'color 0.8s ease' }}>
-            Brand Intelligence
-          </span>
         </div>
 
         {/* Tab Navigation */}
@@ -48,16 +70,17 @@ function Header({ activeView, onViewChange, connected, theme, onToggleTheme, act
           </button>
         </nav>
 
-        {/* Right: Theme toggle + Notifications + Status */}
+        {/* Right: Notifications + Status */}
         <div className="flex items-center gap-3">
-          <NotificationCenter activityLog={activityLog} isDark={isDark} />
-          <button onClick={onToggleTheme} className="theme-toggle" title="Toggle theme">
-            {theme === 'light' ? '🌙' : '☀️'}
-          </button>
+          <NotificationCenter activityLog={activityLog} isDark={false} />
           <div className="flex items-center gap-2">
             <div className={`live-dot ${!connected ? 'live-dot-off' : ''}`} />
-            <span className="text-[0.65rem] text-gray-400 font-medium"
-                  style={{ transition: 'color 0.8s ease' }}>
+            <span style={{
+              fontSize: '0.65rem',
+              fontWeight: 500,
+              color: 'var(--text-muted)',
+              transition: 'color 0.3s',
+            }}>
               {connected ? 'Live' : 'Offline'}
             </span>
           </div>

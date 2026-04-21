@@ -6,30 +6,27 @@ import CrisisAlert from './components/CrisisAlert';
 import ProductModal from './components/ProductModal';
 import OverviewTab from './components/OverviewTab';
 import DatabaseTab from './components/DatabaseTab';
-import SentimentPulse from './components/SentimentPulse';
 import SocialMediaFeed from './components/SocialMediaFeed';
 import AIInsightsPanel from './components/AIInsightsPanel';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import AIChatAssistant from './components/AIChatAssistant';
+import StatsTicker from './components/StatsTicker';
+import ManifestoSection from './components/ManifestoSection';
+import PremiumFooter from './components/PremiumFooter';
 
 const SOCKET_URL = import.meta.env.PROD ? '' : 'http://localhost:3001';
 
-function App({ theme: externalTheme, activeView: externalActiveView, setActiveView: externalSetActiveView, onActivityLogUpdate }) {
+function App({ activeView: externalActiveView, setActiveView: externalSetActiveView, onActivityLogUpdate }) {
   const [products, setProducts] = useState([]);
   const [connected, setConnected] = useState(false);
   const [activityLog, setActivityLog] = useState([]);
   const [scoreHistory, setScoreHistory] = useState([]);
   const [activeView, setActiveView] = useState('overview');
-  const [theme, setTheme] = useState('light');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const prevScoresRef = useRef({});
 
-  // Use external theme and activeView if provided
-  const currentTheme = externalTheme || theme;
   const currentActiveView = externalActiveView || activeView;
   const currentSetActiveView = externalSetActiveView || setActiveView;
-
-  const toggleTheme = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
 
   useEffect(() => {
     const socket = io(SOCKET_URL);
@@ -106,10 +103,23 @@ function App({ theme: externalTheme, activeView: externalActiveView, setActiveVi
     setScoreHistory((prev) => [...prev, snap].slice(-30));
   }
 
-  const isDark = currentTheme === 'dark';
+  // isDark is now computed from CSS custom property for components that still need it
+  // Components should prefer CSS vars, but some need the boolean for logic
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const progress = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--theme-progress') || '0');
+      setIsDark(progress > 0.5);
+    };
+    const interval = setInterval(check, 200);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className={`min-h-screen relative ${isDark ? 'dark-theme' : ''}`} style={{ background: isDark ? '#000' : '#fff' }}>
+    <div className="min-h-screen relative" style={{ background: 'var(--bg-primary)', transition: 'background 0.3s' }}>
+      {/* ═══ Stats Ticker — Brand metrics strip ═══ */}
+      <StatsTicker products={products} activityLog={activityLog} isDark={isDark} />
+
       {/* ═══ Foreground content ═══ */}
       <div className="relative" style={{ zIndex: 1 }}>
         {currentActiveView === 'overview' ? (
@@ -117,7 +127,7 @@ function App({ theme: externalTheme, activeView: externalActiveView, setActiveVi
             products={products}
             scoreHistory={scoreHistory}
             activityLog={activityLog}
-            theme={currentTheme}
+            theme={isDark ? 'dark' : 'light'}
             prevScores={prevScoresRef.current}
             onProductClick={setSelectedProduct}
           />
@@ -127,7 +137,7 @@ function App({ theme: externalTheme, activeView: externalActiveView, setActiveVi
             scoreHistory={scoreHistory}
             activityLog={activityLog}
             prevScores={prevScoresRef.current}
-            theme={currentTheme}
+            theme={isDark ? 'dark' : 'light'}
             onProductClick={setSelectedProduct}
           />
         )}
@@ -136,17 +146,17 @@ function App({ theme: externalTheme, activeView: externalActiveView, setActiveVi
         {currentActiveView === 'database' && products.length > 0 && (
           <div style={{ padding: '0 24px 48px', maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ 
-                fontSize: '1.5rem', 
-                fontWeight: 600, 
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 600,
                 marginBottom: '1rem',
-                color: isDark ? '#fff' : '#0a0a0a'
+                color: 'var(--text-primary)',
               }}>
                 Live Social Media Feed
               </h3>
-              <p style={{ 
-                fontSize: '0.875rem', 
-                color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+              <p style={{
+                fontSize: '0.875rem',
+                color: 'var(--text-muted)',
                 marginBottom: '1rem'
               }}>
                 Real-time sentiment from Reddit r/Sneakers. Monitor what people are saying about Nike products.
@@ -154,17 +164,17 @@ function App({ theme: externalTheme, activeView: externalActiveView, setActiveVi
               <SocialMediaFeed isDark={isDark} />
             </div>
             <div style={{ marginTop: '3rem' }}>
-              <h3 style={{ 
-                fontSize: '1.5rem', 
-                fontWeight: 600, 
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 600,
                 marginBottom: '1rem',
-                color: isDark ? '#fff' : '#0a0a0a'
+                color: 'var(--text-primary)',
               }}>
                 AI-Powered Insights
               </h3>
-              <p style={{ 
-                fontSize: '0.875rem', 
-                color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+              <p style={{
+                fontSize: '0.875rem',
+                color: 'var(--text-muted)',
                 marginBottom: '1rem'
               }}>
                 Our AI analyzes trends, predicts performance, and provides actionable recommendations.
@@ -174,22 +184,18 @@ function App({ theme: externalTheme, activeView: externalActiveView, setActiveVi
           </div>
         )}
 
-        {/* ── AI Insight Box (below hero KPIs, inside overview wrapper) ── */}
+        {/* ── AI Insight Box (overview) ── */}
         {currentActiveView === 'overview' && products.length > 0 && (
           <div style={{ padding: '0 24px 48px', maxWidth: 1200, margin: '0 auto' }}>
             <AIInsightBox products={products} isDark={isDark} />
           </div>
         )}
 
-        <footer className="py-10 text-center border-t border-gray-100" style={{ borderColor: isDark ? 'rgba(255,255,255,0.05)' : undefined, paddingBottom: '60px' }}>
-          <p className="text-[0.6rem] uppercase tracking-[0.3em] text-gray-400">
-            Nike Brand Intelligence · Real-Time Analytics
-          </p>
-        </footer>
+        {/* ═══ Premium Footer ═══ */}
+        <PremiumFooter isDark={isDark} />
       </div>
 
-      {/* ── Fixed overlays (outside scroll wrapper) ── */}
-      <SentimentPulse products={products} isDark={isDark} />
+      {/* ── Fixed overlays ── */}
       <PerformanceMonitor isDark={isDark} />
       <AIChatAssistant products={products} isDark={isDark} />
       <CrisisAlert products={products} />
